@@ -1,0 +1,28 @@
+---
+title: "Rename files"
+author: "Juliana S. Capitanio"
+date: "August 17, 2015"
+output: html_document
+---
+
+I'm renaming all the smFISH files so they can be used in the AroSpotFindingSuite.
+I'll collect all the old names and the new names in a table so I can know what experimental condition each image refers to and rename them later if desired.
+Before starting go to where the images are and setwd.
+```{r}
+old_name <- list.files(path = ".")
+new_name <- as.character()
+
+for (i in 1:length(old_name)) {  
+  new_name[i] = paste(substr(old_name[i], 1, nchar(old_name[i])-4), "_mask3D.tif", sep = '')
+}
+
+name_table <- as.data.frame(cbind(old_name, new_name), stringAsFactors = FALSE)
+name_table[] <- lapply(name_table, as.character)
+
+file.rename(name_table$old_name, name_table$new_name)
+
+setwd("../")
+write.csv(name_table, 'renaming table nuclei masks.csv')
+
+```
+

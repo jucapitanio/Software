@@ -1,0 +1,53 @@
+/* Use this function to create masks of the dapi stain within images of the cell masks.
+This is necessary so the sizes are similar to the ones we see in the resulting image analysis 
+files in matlab. These will be used to determine if spots are inside nuclei.
+*/
+
+function nuclei_masks(inputdapi, inputmask, output, filedapi, filemask) {
+
+	open(inputdapi + filedapi);
+	run("Gaussian Blur 3D...", "x=5 y=5 z=5");
+	setAutoThreshold("Default dark");
+	//run("Threshold...");
+	setAutoThreshold("Default dark stack");
+	setOption("BlackBackground", true);
+	run("Convert to Mask", "method=Default background=Dark black");
+	run("Options...", "iterations=10 count=1 black do=Erode stack");
+
+	open(inputmask + filemask);
+	run("Create Selection");
+	run("Make Inverse");
+	run("Enlarge...", "enlarge=3 pixel");
+	roiManager("Add");
+
+	selectWindow(filedapi);
+	roiManager("Select", 0);
+	run("Crop");
+	saveAs("Tiff", output + filedapi);
+	
+	selectWindow(filemask);
+	close();
+	selectWindow(filedapi);
+	close();
+	// run("Close");
+	roiManager("Deselect");
+	roiManager("Delete");
+	// run("Close");
+}
+
+/* Make sure there is one folder with copies of the tiff files for cell masks called cell masks
+then create another folder for nuclei masks to save the output. The images for dapi can come from the 
+ImageData dapi folder.
+*/
+
+inputdapi = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015 2nd sem\\Images\\Jul16_15\\vRNA FISH\\deconv for RF\\rootCell\\ImageData\\dapi\\";
+inputmask = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015 2nd sem\\Images\\Jul16_15\\vRNA FISH\\deconv for RF\\rootCell\\cell masks\\"
+output = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015 2nd sem\\Images\\Jul16_15\\vRNA FISH\\deconv for RF\\rootCell\\nuclei masks\\";
+
+// This will iterate the function created above in all the files present in input.
+setBatchMode(true);
+listdapi = getFileList(inputdapi);
+listmask = getFileList(inputmask);
+for (i = 0; i < listdapi.length; i++)
+        nuclei_masks(inputdapi, inputmask, output, listdapi[i], listmask[i]);
+setBatchMode(false);

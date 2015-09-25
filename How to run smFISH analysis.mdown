@@ -1,0 +1,88 @@
+# Running smFISH analysis using Aro Spot Finding Suite
+
+## Preparing your files:
+
+1. Create the directories needed.
+
+* AnalysisDate
+	* ImagesOriginal:
+	* rootCell
+		* ImageData
+			* dapi
+			* cy3
+			* cy5
+			* any other dyes...
+		* SegmentationMasks
+		* AnalysisJu
+		* cell masks
+		* nuclei masks
+		* Cell plot images
+
+Make a root folder to contain all the inputs and outputs of the analysis (AnalysisDate). Inside this folder create a folder to contain your original images (ImagesOriginal) and a folder for your analysis (rootCell). Inside rootCell create and ImageData folder, with subfolders for each dye you have in your images. Also make SegmentationMasks, AnalysisJu, cell masks, nuclei masks and Cell plot images.
+
+2. Move all the images you want to analyze into the ImagesOriginal folder.
+
+The images should be from the same experiment, performed at the same time and imaged with the same conditions. Ex. all vRNA FISH images from 20150716 or all GAPDH images from 20150716.
+Once images are in the folder run the R script **"Rename files in a directory.Rmd"** to change the image names to the correct format. Make sure you set the home directory in R to the folder containing your images. This will also create a table with the new names and old names so you'll know what your original file was. The table is saved as "renaming table.csv" and saved in the AnalysisDate folder.
+
+3. Transform images into .tiff files and create cell masks.
+
+Once your image files have been renamed open the **"Macro IJ cell vRNA batch"** in a text editor and adjust the input and output directories (input = ImagesOriginal folder; output = ImageData folder). Save the file and open Image J, then run this Image J macro (Plugins -> Macros -> Run). This will create all the .tiff files for the different dyes and the binary tiff mask files for the cell boundaries. All the files will be saved in the ImageData folder. Manually move each dye into the correct subfolder of ImageData.
+Move the cell mask files into the SegmentationMasks folder and a copy into the cell masks folder.
+
+4. Prepare 3D binary nuclei masks in tiff.
+
+The last files to prepare are binary 3D masks for the nuclei so we can later localize the spots as nuclear or cytoplasmic. There are a few issues here, due epifluorescence microscopy itself. The first one is that at the top and bottom stacks of your image you still see scattered dapi staining, even though you are probably already outside the nuclei boundaries, so we'll keep that point in mind when doing the analysis. The second is that the strength of the dapi signal may show some scattered brightness outside the borders of the nuclear envelope, so to be conservative we will select as our nuclei mask regions 10px inside the limits of the dapi stain. This may underrepresent the number of intranuclear spots if the localize close to the inner face of the NE.
+To create this masks open the **"nuclei mask with Z"** Image J macro in a text editor and change: inputdapi = ImageData\dapi\ folder, inputmask = rootCell\cell masks\ folder and output = rootCell\nuclei masks\ folder.If you'd like you can also change the mask erosion settings here. Run the macro in Image J.
+Finally run the R script **"Rename nuclei 3d masks.Rmd"** to change the name of the masks or they will not work properly in MATLAB later. To run this script make sure the nuclei masks folder is set as your home directory this will also save a csv table of the name changes one directory above.
+
+5. Add the properly modified Aro_parameters file.
+
+Add a copy of the **"Aro_parameters.m"** file into the rootCell folder. Make sure you alter the required fields, such as dyesUsed (cy3, cy5, etc.) and topdir (rootCell folder). You can also change parameters for several of the Aro suite functions, such as the Random Forest classifier or what statistics is used to select spots initially, etc.
+
+## Running the Aro Suite in MATLAB:
+
+Before we start, once you open MATLAB, make sure to add all the relevant folders by navigating to them, left clicking and selecting add to path, selected folder and subfolders. We need to add the *AnalysisDate* folder, the *Documents\MATLAB* folder (make sure the Aro folder and the tiffread2 folders are inside this folder) and the *Documents\Lab Stuff 2015 2nd sem\Software\matlab scripts and functions* folder.
+Once all foders are added open the file **"Script_1st.m"** (inside the matlab scripts and functions folder) and navigate MATLAB to the rootCell folder.
+
+Most of the instructions on running the Aro Spot Finding Suite are included in the **"Script_1st.m"**. You can also find details in the manual for the suite **"ArospotFindingSuite_v2.5_UserGuide_15Dec2014.pdf"** (inside the MATLAB\Aro folder).
+
+Run through sections 1 to 7 of the script in the 2015 version of MATLAB to create the classifier and apply it to images. 
+
+Then open MATLAB 2012a to run the *reviewFISHClassification* function. Back in MATLAB 2015 run section 8. Repeat these 2 things several times with different images (5-6 times usually) until you stop seeing improvements to the classifier.
+
+Back in MATLAB 2015 run section 9 and take a look at the error plots to verify that your classifier has been properly trained. See the Aro Suite manual for example images of this.
+
+The operations on this script will give you information on total spots detected per image and dye as well as information on the error from the classifier. Relevant files can be found in the *rootCell\AnalysisJu\Plots* folder.
+
+## Evaluating and summarizing the resulting data:
+
+Since for my applications I need more information then just the total number of spots per image I have written a set of functions. These functions are setup to run in a loop over all images in **"Script_2nd_loop.m"** ((inside the matlab scripts and functions folder), open that file to use them.
+
+The first steps of the script will identify colocalization between spots of 2 different dyes and subset those. Then it will check if the spots localize to the nuclei or cytoplasm of the cell (based on the 3D nuclei masks).
+
+Finally, it will compile a summary of total spots, cytoplasmic spots, nuclear spots and % of nuclear spots for all images. This will be performed for each dye and it will be done twice, once for the entire Zstack set of images and once for a subset of central images in the stack. All these results will be saved together in the file **"AnalysisSummary.mat"**, inside the rootCell folder.
+
+These functions will also create a figure with 2 plots for each image analyzed. The first plot will have all the spots that were selected as colocalizing for the 2 dyes used and the 2nd plot will show which spots were classified as nuclear or cytoplasmic. These files are saved in the *rootCell\Cell plot images* folder.
+
+If you want you can also run section 2 of the script to export all the counts data into csv files (they will be in the rootCell folder). These can then be read by Excel or R for plotting and analysis.
+
+## Statistical Analysis of the results:
+
+If you open the exported csv files in excel you can rearrange them by removing duplicate data (uncheck my data has header) and then deleting the empty line. Sort the file by the Pos column. Open the renaming table to identify the original file names for each position and create a new field to identify experimental condition (like drug).
+This data can now be imported into R of further analyzed in excel.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
