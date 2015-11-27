@@ -4,7 +4,7 @@
 % must be in the root directory and the mask files in the SegmentationMasks
 % folder.
 
-for i = 1:59
+for i = 1:67
     createSegmenttrans(strcat('Pos',num2str(i)));
 end;
 %% 
@@ -13,10 +13,10 @@ createSegImages('tif');
 doEvalFISHStacksForAll
 %% To create this training set I used the images Pos10, 20, 30, 40, 49, 59. Repeating the command below.
 % This includes all the different experimental conditions (drugs).
-createSpotTrainingSet('cy3_Pos10','Core-NS2')
+createSpotTrainingSet('cy3_Pos11','Core-NS2')
 %% To create this training set I used the images Pos10, 20, 30, 40, 49, 59. Repeating the command below.
 % This includes all the different experimental conditions (drugs).
-createSpotTrainingSet('cy5_Pos59','NS3-3UTR')
+createSpotTrainingSet('cy5_Pos11','NS3-3UTR')
 %% 
 load trainingSet_cy3_Core-NS2.mat
 trainingSet=trainRFClassifier(trainingSet);
@@ -50,22 +50,22 @@ classifySpotsOnDirectory(1,trainingSet,'cy5')
 % This is not that useful, but it's good to check classification error.
 % It all ends saved in the Plots folder under AnalysisJu.
 
-rootfolder = 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell'
-cy3Spotstats = 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\SpotStats\cy3'
-cy5Spotstats = 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\SpotStats\cy5'
+rootfolder = 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell'
+cy3Spotstats = 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy3'
+cy5Spotstats = 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy5'
 
 cd(cy3Spotstats);
-spotStatsDataAligning('20150716cy3', 0);
+spotStatsDataAligning('20150925cy3', 0);
 
 cd(cy5Spotstats);
-spotStatsDataAligning('20150716cy5', 0);
+spotStatsDataAligning('20150925cy5', 0);
 
 cd(rootfolder);
 
-movefile('C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\SpotStats\cy3\wormData_20150716cy3.mat', 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\Plots\wormData_20150716cy3.mat');
-movefile('C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\SpotStats\cy5\wormData_20150716cy5.mat', 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\Plots\wormData_20150716cy5.mat');
-movefile('C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\SpotStats\cy3\ErrorPercentagePlot_20150716cy3.fig', 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\Plots\ErrorPercentagePlot_20150716cy3.fig');
-movefile('C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\SpotStats\cy5\ErrorPercentagePlot_20150716cy5.fig', 'C:\Users\Juliana\Documents\Lab Stuff 2015 2nd sem\Images\Jul16_15\vRNA FISH\deconv for RF\rootCell\AnalysisJu\Plots\ErrorPercentagePlot_20150716cy5.fig');
+movefile('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy3\wormData_20150925cy3.mat', 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\Plots\wormData_20150925cy3.mat');
+movefile('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy5\wormData_20150925cy5.mat', 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\Plots\wormData_20150925cy5.mat');
+movefile('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy3\ErrorPercentagePlot_20150925cy3.fig', 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\Plots\ErrorPercentagePlot_20150925cy3.fig');
+movefile('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy5\ErrorPercentagePlot_20150925cy5.fig', 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\Plots\ErrorPercentagePlot_20150925cy5.fig');
 
 %% FROM HERE ON, USE THE Script_wmyfunctions_loop.m to process everything.
 % I left the example code below in case I need to do part of the analysis

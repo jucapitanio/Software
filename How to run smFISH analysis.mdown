@@ -29,10 +29,11 @@ Once images are in the folder run the R script **"Rename files in a directory.Rm
 
 Once your image files have been renamed open the **"Macro IJ cell vRNA batch"** in a text editor and adjust the input and output directories (input = ImagesOriginal folder; output = ImageData folder). Save the file and open Image J, then run this Image J macro (Plugins -> Macros -> Run). This will create all the .tiff files for the different dyes and the binary tiff mask files for the cell boundaries. All the files will be saved in the ImageData folder. Manually move each dye into the correct subfolder of ImageData.
 Move the cell mask files into the SegmentationMasks folder and a copy into the cell masks folder.
+Note: If you only have dapi and one more channel you have to change the code to reflect that. Also, it may be better to use the cy3 channel only to make the masks if the cy5 is very weak.
 
 4. Prepare 3D binary nuclei masks in tiff.
 
-The last files to prepare are binary 3D masks for the nuclei so we can later localize the spots as nuclear or cytoplasmic. There are a few issues here, due epifluorescence microscopy itself. The first one is that at the top and bottom stacks of your image you still see scattered dapi staining, even though you are probably already outside the nuclei boundaries, so we'll keep that point in mind when doing the analysis. The second is that the strength of the dapi signal may show some scattered brightness outside the borders of the nuclear envelope, so to be conservative we will select as our nuclei mask regions 10px inside the limits of the dapi stain. This may underrepresent the number of intranuclear spots if the localize close to the inner face of the NE.
+The last files to prepare are binary 3D masks for the nuclei so we can later localize the spots as nuclear or cytoplasmic. There are a few issues here, due to epifluorescence microscopy itself. The first one is that at the top and bottom stacks of your image you still see scattered dapi staining, even though you are probably already outside the nuclei boundaries, so we'll keep that point in mind when doing the analysis. The second is that the strength of the dapi signal may show some scattered brightness outside the borders of the nuclear envelope, so to be conservative we will select as our nuclei mask regions 10px inside the limits of the dapi stain. This may underrepresent the number of intranuclear spots if the localize close to the inner face of the NE.
 To create this masks open the **"nuclei mask with Z"** Image J macro in a text editor and change: inputdapi = ImageData\dapi\ folder, inputmask = rootCell\cell masks\ folder and output = rootCell\nuclei masks\ folder.If you'd like you can also change the mask erosion settings here. Run the macro in Image J.
 Finally run the R script **"Rename nuclei 3d masks.Rmd"** to change the name of the masks or they will not work properly in MATLAB later. To run this script make sure the nuclei masks folder is set as your home directory this will also save a csv table of the name changes one directory above.
 
@@ -47,6 +48,7 @@ Once all foders are added open the file **"Script_1st.m"** (inside the matlab sc
 
 Most of the instructions on running the Aro Spot Finding Suite are included in the **"Script_1st.m"**. You can also find details in the manual for the suite **"ArospotFindingSuite_v2.5_UserGuide_15Dec2014.pdf"** (inside the MATLAB\Aro folder).
 
+Remember to change the value of i to correct number of images you have.
 Run through sections 1 to 7 of the script in the 2015 version of MATLAB to create the classifier and apply it to images. 
 
 Then open MATLAB 2012a to run the *reviewFISHClassification* function. Back in MATLAB 2015 run section 8. Repeat these 2 things several times with different images (5-6 times usually) until you stop seeing improvements to the classifier.
