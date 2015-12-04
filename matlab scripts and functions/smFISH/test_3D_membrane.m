@@ -1,9 +1,21 @@
-dapi = open('dapi_Pos1_SegStacks.mat');
+dapi = open('dapi_Pos44_SegStacks.mat');
 dapiimg = dapi.segStacks{1, 1};
 dapimesh = mesh3(dapiimg);
 dapimesh.preprocessth = [2.5 50 .8];
-dapimesh.zxr = 1.844780194439832;
-dapimesh.PreProcessImage;
+dapimesh.zxr = 0.4517;
+% 1 / 0.24 / 9.2239     the z step is 0.24um, 1um is 9.2239 pixel
+
+dapimesh.PreProcessImage; % this enlarges the image, for now OK, 
+% later remove that part so it corresponds to the spots coordinates.
+% actually it may be best to use the same enlargement in the spot images
+% before detection to create clear OUTSIDE nuclei stacks.
+
+%% test shrink images
+imagebig = dapimesh.image;
+extsize=5;
+imagesmall = imagebig(1+extsize:end-extsize,1+extsize:end-extsize,1+extsize:end-extsize);
+
+
 [ l1,v1,l2,v2,l3,v3 ] = DirectionalLaplacian(dapimesh.image);
 [ bw2 ] = NonMaxiumSuppression( l1,l2,l3,v1,dapimesh.cannyth,dapimesh.image);
 

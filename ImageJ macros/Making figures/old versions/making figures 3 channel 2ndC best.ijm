@@ -6,9 +6,7 @@ The projections are used to create a composite and a montage with scale bars. Bo
 The channels are not saved separately in .tif files unless you uncomment that function.
 */
 
-/* I need to see if this will work better switching around the channel for focusing in IF images. 
-This is probably ideal for cy5/cy3/dapi FISH though as the cy3 FISH will be the best channel. 
-I also need to rewrite a version for 2 channel images.
+/* I need to see if this will work better switching around the channel for focusing in IF images. This is probably ideal for cy5/cy3/dapi FISH though as the cy3 FISH will be the best channel. I also need to rewrite a version for 2 channel images.
 */
 
 function make_figure(input, output, filename, C0, C1, C2) {
@@ -19,6 +17,7 @@ function make_figure(input, output, filename, C0, C1, C2) {
 	// Adjust brightness and contrast first, not sure if makes a difference. Also set the image scale to global so you can add scale bars later.
 	run("Brightness/Contrast...");
 	selectWindow(filename + " - C=0");
+	getDimensions(dummy, dummy, dummy, nslice, dummy);
 	resetMinAndMax();
 	selectWindow(filename + " - C=1");
 	resetMinAndMax();
@@ -27,56 +26,27 @@ function make_figure(input, output, filename, C0, C1, C2) {
 	run("Properties...", "global");
 
 	// Finding the central focused slice (make sure you choose the channel to use for this wisely, for ex. Nup98 or FISH channel, not DAPI).
-	selectWindow(filename + " - C=0");
+	selectWindow(filename + " - C=1");
 	run("Find focused slices", "select=100 variance=0.000 edge select_only");
-	selectWindow("Focused slices of " + filename + " - C=0_100.0%");
+	selectWindow("Focused slices of " + filename + " - C=1_100.0%");
 	Zgood = getMetadata("Label");
 	Zgsub = substring(Zgood, 2, lengthOf(Zgood));
 	Zgnum = parseInt(Zgsub); 
 	if (Zgnum > 3) {
 		Zstart = d2s((Zgnum - 3),0);
-		} else {
+	} else {
 		Zstart = 1;
-		}
-	Zstop = d2s((Zgnum + 3),0);
+	}
+	if (Zgnum + 3 <= nslice) {
+		Zstop = d2s((Zgnum + 3),0);
+	} else {
+		Zstop = d2s((nslice),0);
+	}
 	option2 = " slices=" + Zstart + "-" + Zstop;
 
 	// Create a substack of about 6 in focus images, you can change that by changing the number in Zstart Zstop to include more or less images.
 	// As is this will only save a composite and montage of each file, if you'd like to save each channel uncomment the lines with saveAs.
 	// First for the channel used to find the focused stack
-	selectWindow(filename + " - C=0"); 
-	run("Make Substack...", option2);
-	selectWindow("Substack (" + Zstart + "-" + Zstop + ")");
-	run("EDF Easy ", "quality='0' topology='0' show-topology='off' show-view='off'");
-
-		// The following code is required in order to wait for the the EDF plugin to finish, and open the expected image. 
-		// We must wait for a window called "Output" . Batch mode cannot be true, because if so the window will not open. 
-	initTime = getTime(); 
-	oldTime = initTime; 
-	while (!isOpen("Output")) { 
-	    elapsedTime = getTime() - initTime; 
-	    newTime = getTime() - oldTime; 
-	// print something every 10 seconds so that we will know it is still alive 
-	    if (newTime > 10000) { 
-	        oldTime = getTime(); 
-	             newTime = 0; 
-	        print(elapsedTime/1000, " seconds elapsed"); 
-	    } 
-	} 
-	wait(1000); // let's really make sure that window is open -- give it another second 
-	selectImage("Output"); 
-	rename(filename + "C0.tif");
-	setFont("SansSerif", 24, " antialiased");
-	drawString(C0, 40, 40);
-	//saveAs("Tiff", output + filename + "C0.tif");
-	selectWindow("Substack (" + Zstart + "-" + Zstop + ")");
-	close();
-	selectWindow(filename + " - C=0"); 
-	close();
-	selectWindow("Focused slices of " + filename + " - C=0_100.0%");
-	close();
-
-	// Run it again for other channels, if you only have 2 channels, remove one of the chuncks below.
 	selectWindow(filename + " - C=1"); 
 	run("Make Substack...", option2);
 	selectWindow("Substack (" + Zstart + "-" + Zstop + ")");
@@ -99,11 +69,44 @@ function make_figure(input, output, filename, C0, C1, C2) {
 	wait(1000); // let's really make sure that window is open -- give it another second 
 	selectImage("Output"); 
 	rename(filename + "C1.tif");
+	setFont("SansSerif", 24, " antialiased");
 	drawString(C1, 40, 40);
 	//saveAs("Tiff", output + filename + "C1.tif");
 	selectWindow("Substack (" + Zstart + "-" + Zstop + ")");
 	close();
 	selectWindow(filename + " - C=1"); 
+	close();
+	selectWindow("Focused slices of " + filename + " - C=1_100.0%");
+	close();
+
+	// Run it again for other channels, if you only have 2 channels, remove one of the chuncks below.
+	selectWindow(filename + " - C=0"); 
+	run("Make Substack...", option2);
+	selectWindow("Substack (" + Zstart + "-" + Zstop + ")");
+	run("EDF Easy ", "quality='0' topology='0' show-topology='off' show-view='off'");
+
+		// The following code is required in order to wait for the the EDF plugin to finish, and open the expected image. 
+		// We must wait for a window called "Output" . Batch mode cannot be true, because if so the window will not open. 
+	initTime = getTime(); 
+	oldTime = initTime; 
+	while (!isOpen("Output")) { 
+	    elapsedTime = getTime() - initTime; 
+	    newTime = getTime() - oldTime; 
+	// print something every 10 seconds so that we will know it is still alive 
+	    if (newTime > 10000) { 
+	        oldTime = getTime(); 
+	             newTime = 0; 
+	        print(elapsedTime/1000, " seconds elapsed"); 
+	    } 
+	} 
+	wait(1000); // let's really make sure that window is open -- give it another second 
+	selectImage("Output"); 
+	rename(filename + "C0.tif");
+	drawString(C0, 40, 40);
+	//saveAs("Tiff", output + filename + "C0.tif");
+	selectWindow("Substack (" + Zstart + "-" + Zstop + ")");
+	close();
+	selectWindow(filename + " - C=0"); 
 	close();
 
 	// Last run for 3rd channel
@@ -185,18 +188,15 @@ function make_figure(input, output, filename, C0, C1, C2) {
 	} 
 }
 
-// Below are the folder were your .dv files are (input) and the folder where you'd like to save the files (output). 
-// The channels in the image are used for labels
+// Below are the folder were your .dv files are (input) and the folder where you'd like to save the files (output).
 
-input = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015\\images\\28 april 2015\\Core dT\\3h\\test\\input\\";
-output = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015\\images\\28 april 2015\\Core dT\\3h\\test\\output\\";
+input = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015\\Images\\DeltaVision microscope\\2015-07-02 FISH-IF drugs\\Immunofluorescence\\Nup98-RHA IF original\\";
+output = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015\\Images\\DeltaVision microscope\\2015-07-02 FISH-IF drugs\\Immunofluorescence\\Nup98-RHA IF Figures\\";
 C0 = "Core";
 C1 = "oligodT";
 C2 = "DAPI";
-
 // This will iterate the function created above in all the files present in input.
-// You cannot set BatchMode true because of the depth of field plugin, so this will take a while. 
-//I may try using Zproject later to see if that's better.
+// You cannot set BatchMode true because of the depth of field plugin, so this will take a while. I may try using Zproject later to see if that's better.
 
 list = getFileList(input);
 for (i = 0; i < list.length; i++)
