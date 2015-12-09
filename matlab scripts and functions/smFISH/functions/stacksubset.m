@@ -1,10 +1,10 @@
-function [ cy3subset, cy5subset ] = stacksubset( cy3pointcoord, cy5pointcoord, start, stop )
+function [ spotsubset ] = stacksubset( spotpointcoord, start, stop )
 %stacksubset subset point coordnate files only for given Z stacks.
 
-start = start * 0.24 * 9.2239;
-stop = stop * 0.24 * 9.2239;
-cy3subset=cy3pointcoord(cy3pointcoord(:,3)>start & cy3pointcoord(:,3)<stop,:);
-cy5subset=cy5pointcoord(cy5pointcoord(:,3)>start & cy5pointcoord(:,3)<stop,:);
+start = ((start + 5) * 2.213736) - 2.213726;
+stop = ((stop + 5) * 2.213736) - 2.213726;
+spotsubset=spotpointcoord(spotpointcoord(:,3)>start & spotpointcoord(:,3)<stop,:);
+
 
 end
 

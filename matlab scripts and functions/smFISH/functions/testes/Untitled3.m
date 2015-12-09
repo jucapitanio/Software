@@ -1,0 +1,1 @@
+distances = point2trimesh(dapiiso, 'QueryPoints', locs3, 'Algorithm', 'parallel_vectorized_subfunctions'); 

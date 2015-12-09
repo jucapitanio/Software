@@ -1,11 +1,16 @@
+%% Add all necessary folder paths to functions and data:
+% In case the paths were lost from the 1st script.
+addpath(genpath('C:\Users\Juliana\Documents\MATLAB'));
+addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Software\matlab scripts and functions'));
+addpath(genpath(strcat('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\somestufftogettofolder\', AnalysisDate)));
 %% Looping all the functions I made to analyze all images and save data
 
+%parpool;
 rootfolder = pwd;
-numimg = length(dir(strcat(rootfolder, '\cell masks'))) - 2;
+numimg = size(dir(strcat(rootfolder, '\cell masks')),1) - 2;
 
 cy3_spotStats_files = dir(fullfile(strcat(rootfolder,'\AnalysisJu\SpotStats\cy3'), 'cy3_Pos*_spotStats.mat'));
 cy5_spotStats_files = dir(fullfile(strcat(rootfolder,'\AnalysisJu\SpotStats\cy5'), 'cy5_Pos*_spotStats.mat'));
-%dapimasktiff = dir(fullfile('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\nuclei masks', 'dapi_Pos*.tif'));
 dapisegstack = dir(fullfile(strcat(rootfolder,'\AnalysisJu\SegStacks\dapi'), 'dapi_Pos*_SegStacks.mat'));
 cellsegmask = dir(fullfile(strcat(rootfolder,'\SegmentationMasks'), 'segmenttrans_Pos*.mat'));
 
@@ -16,44 +21,64 @@ cy5midcountstt = struct('nuclear',{}, 'cyto',{}, 'total',{}, 'per100nuc',{}, 'Po
 
 cellarea = struct('cellareaguess',{}, 'Pos', {});
 
+
+% I cannot do clear or save inside a parfor loop, so I had to make it a for
+% loop again... See if therre is another way to use parallel computing, or
+% if you have parfor loops inside all functions possible.
+
 for i = 1:numimg
     
     segmenttrans_maskfile = cellsegmask(i).name;
     cell_area_guess = guestimatecellarea(segmenttrans_maskfile, segmenttrans_maskfile(14:18)); % if more than 99 images will get processed, change to (14:19).
     cellarea = [cellarea, cell_area_guess];
+    clear cell_area_guess segmenttrans_maskfile;
     
     cy3_spotStats_file = cy3_spotStats_files(i).name;
     cy5_spotStats_file = cy5_spotStats_files(i).name;
     [ locs3 ] = goodspots( cy3_spotStats_file );
     [ locs5 ] = goodspots( cy5_spotStats_file );
     [ colocalizedcy3, colocalizedcy5 ] = colocalized( locs3, locs5, 10 );
+    clear locs3 locs5;
     
     if not(isempty(colocalizedcy3)) && not(isempty(colocalizedcy5))
 
         dapisegstackfile = dapisegstack(i).name;
-        [ dapiiso, Vnorm ] = DAPIisosurface( dapisegstackfile );
+        [ dapiiso, Vnorm, stackmid ] = DAPIisosurface2( dapisegstackfile );
+        clear dapisegstackfile;
         
         [ coloccy3dapi ] = Spot2NEdist( dapiiso, colocalizedcy3 );
         [ coloccy5dapi ] = Spot2NEdist( dapiiso, colocalizedcy5 );
+        clear colocalizedcy3 colocalizedcy5;
 
-        [ cy3counts, cy5counts ] = countsummary( coloccy3dapi, coloccy5dapi, cy3_spotStats_file(5:10) );
+        [ cy3counts ] = countsum( coloccy3dapi, cy3_spotStats_file(5:10) );
+        [ cy5counts ] = countsum( coloccy5dapi, cy5_spotStats_file(5:10) );
+        
         cy3countstt = [cy3countstt, cy3counts];
         cy5countstt = [cy5countstt, cy5counts];
+        clear cy3counts cy5counts;
 
-        [ cy3midcoloc, cy5midcoloc ] = stacksubset( coloccy3dapi, coloccy5dapi, 10, 20 );
-        [ cy3countsmid, cy5countsmid ] = countsummary( cy3midcoloc, cy5midcoloc, cy3_spotStats_file(5:10) );
+        [ cy3midcoloc ] = stacksubset( coloccy3dapi, stackmid - 5, stackmid + 5 );
+        [ cy5midcoloc ] = stacksubset( coloccy5dapi, stackmid - 5, stackmid + 5 );
+        
+        [ cy3countsmid ] = countsum( cy3midcoloc, cy3_spotStats_file(5:10) );
+        [ cy5countsmid ] = countsum( cy5midcoloc, cy5_spotStats_file(5:10) );
+        
         cy3midcountstt = [cy3midcountstt, cy3countsmid];
         cy5midcountstt = [cy5midcountstt, cy5countsmid];
+        clear cy3countsmid cy5countsmid;
 
-        createfigure1(cy3midcoloc(:,1),cy3midcoloc(:,2), cy5midcoloc(:,1),cy5midcoloc(:,2), cy3midcoloc(:,4), cy5midcoloc(:,4));
-        %savefig(strcat('Cell plot images\',cy3_spotStats_file(5:9),'.fig'));
-
-        %clear  cy3_spotStats_file cy5_spotStats_file locs3 locs5 colocalizedcy3 colocalizedcy5 dapimasktiff_filepath coloccy3dapi coloccy5dapi cy3counts cy5counts cy3midcoloc cy5midcoloc cy3countsmid cy5countsmid cell_area_guess
+        figspanel( dapiiso, Vnorm, coloccy3dapi, coloccy5dapi, cy3midcoloc, cy5midcoloc, cy3_spotStats_file);
+        
+        clear cy5_spotStats_file cy3midcoloc cy5midcoloc stackmid;
+        save(strcat(rootfolder,'\SpotsData\SpotsIsosurf',cy3_spotStats_file(5:10),'.mat'));
+        clear  cy3_spotStats_file coloccy3dapi colocsy5dapi Vnorm dapiiso;
+         
     end;
 end;
-
-%clear cy3_spotStats_files cy5_spotStats_files dapimasktiff segmenttrans_maskfile
-%save('AnalysisSummary.mat')
+figure('Visible', 'on', 'name','toClose'); 
+close 'toClose';
+clear cy3_spotStats_files cy5_spotStats_files dapisegstack cellsegmask rootfolder numimg;
+save('AnalysisSummary.mat');
 
 %% If you want you can also export the files to csv.
 

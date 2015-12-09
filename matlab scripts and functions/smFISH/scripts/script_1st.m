@@ -3,8 +3,11 @@
 % Create the position identifier Mask files with the function below. You
 % must be in the root directory and the mask files in the SegmentationMasks
 % folder.
+rootfolder = pwd;
+numimg = length(dir(strcat(rootfolder, '\cell masks'))) - 2;
+date = '20150716';
 
-for i = 1:67
+parfor i = 1:numimg
     createSegmenttrans(strcat('Pos',num2str(i)));
 end;
 %% 
@@ -50,9 +53,8 @@ classifySpotsOnDirectory(1,trainingSet,'cy5')
 % This is not that useful, but it's good to check classification error.
 % It all ends saved in the Plots folder under AnalysisJu.
 
-rootfolder = 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell'
-cy3Spotstats = 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy3'
-cy5Spotstats = 'C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\rootCell\AnalysisJu\SpotStats\cy5'
+cy3Spotstats = strcat(rootfolder, '\AnalysisJu\SpotStats\cy3');
+cy5Spotstats = strcat(rootfolder, '\AnalysisJu\SpotStats\cy5');
 
 cd(cy3Spotstats);
 spotStatsDataAligning('20150925cy3', 0);

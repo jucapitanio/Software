@@ -32,7 +32,7 @@ BW = imfill(BW, 'holes');
 % Filter components by area, uncomment if desired.
 % The nuclei in a mid stack is between 8000 and 14000 or so
 % Good limits may be [2500 30000]
-BW = bwareafilt(BW, [2500 30000]);
+BW = bwareafilt(BW, [50 30000]);
 
 % Form masked image from input image and segmented image.
 maskedImage = im;

@@ -1,4 +1,4 @@
-function [ imagebig ] = PreProcessImage( image )
+function [ imagebig ] = PreProcessImages( image )
 % preprocess the raw image 
 % Taken from the #D membrane reconstruction library
 

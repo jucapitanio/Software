@@ -6,7 +6,7 @@ dapiimg = dapi.segStacks{1, 1};
 %dapimesh.zxr = 2.213736; % ou 0.45172504761182 reverso
 % 1stack = 0.24um * 9.2239px/um     the z step is 0.24um, 1um is 9.2239 pixel
 
-dapiPP = PreProcessImage(dapiimg); % this enlarges the image, for now OK, 
+dapiPP = PreProcessImages(dapiimg); % this enlarges the image, for now OK, 
 % later use the same enlargement in the spot images
 
 %% Create a binary nuclei mask and shrink the processed images back to the original size.
@@ -24,7 +24,7 @@ end;
 % channels later on.
 cy3spots = open('cy3_Pos9_spotStats.mat');
 locs3=cy3spots.spotStats{1}.locAndClass(cy3spots.spotStats{1}.locAndClass(:,4)==1,1:3); % Careful, the X and Y from spots and isosurface are inverted.
-locs3fix = locs3 + 5; % correct point coordinates to match dapi
+locs3fix = locs3 + 5; % correct point coordinates to match dapi, done in the goodspots
 
 %% Create isosurface and isonormals
 
@@ -58,7 +58,7 @@ Vnorms = isonormals(imgiso,dapifillgaus.vertices);
 points = [];
 points(:,1) = locs3fix(:,2);
 points(:,2) = locs3fix(:,1);
-points(:,3) = (locs3fix(:,3) * 2.213736) - 2.213726;
+points(:,3) = (locs3fix(:,3) * 2.213736) - 2.213726; % I'm doing this in the goodspots function now.
 
 dapifillgaus.vertices(:,3) = (dapifillgaus.vertices(:,3)* 2.213736) - 2.213726;
 
