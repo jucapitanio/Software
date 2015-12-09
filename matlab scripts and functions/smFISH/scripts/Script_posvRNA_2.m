@@ -71,7 +71,7 @@ for i = 1:numimg
         
         clear cy5_spotStats_file cy3midcoloc cy5midcoloc stackmid;
         save(strcat(rootfolder,'\SpotsData\SpotsIsosurf',cy3_spotStats_file(5:10),'.mat'));
-        clear  cy3_spotStats_file coloccy3dapi colocsy5dapi Vnorm dapiiso;
+        clear  cy3_spotStats_file coloccy3dapi coloccy5dapi Vnorm dapiiso;
          
     end;
 end;
