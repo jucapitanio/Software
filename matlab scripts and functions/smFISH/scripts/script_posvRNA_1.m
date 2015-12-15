@@ -34,7 +34,7 @@ clear AnalysisDate;
 % folder.
 rootfolder = pwd;
 numimg = size(dir(strcat(rootfolder, '\cell masks')),1) - 2;
-date = '20150716';
+date = '20150925';
 
 parfor i = 1:numimg
     createSegmenttrans(strcat('Pos',num2str(i)));

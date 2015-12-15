@@ -22,7 +22,7 @@ cd ..\..\;
 
 addpath(genpath('C:\Users\Juliana\Documents\MATLAB'));
 addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Software\matlab scripts and functions'));
-addpath(genpath(strcat('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\somestufftogettofolder\', AnalysisDate)));
+addpath(genpath(strcat('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\negvRNA\rootCell')));
 %addpath(genpath(strcat('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\Jul16_15\vRNA FISH\deconv for RF\test with new script dec2015\', AnalysisDate)));
 
 clear AnalysisDate;
@@ -31,9 +31,12 @@ clear AnalysisDate;
 % Create the position identifier Mask files with the function below. You
 % must be in the root directory and the mask files in the SegmentationMasks
 % folder.
+% MAKE SURE THE PATH TO THE 3D MEMBRANE FOLDER IN MATLAB IS REMOVED OR IT
+% MAY CREATE CONFLICTS.
+
 rootfolder = pwd;
 numimg = length(dir(strcat(rootfolder, '\cell masks'))) - 2;
-date = '20150716';
+date = '20150925';
 
 parfor i = 1:numimg
     createSegmenttrans(strcat('Pos',num2str(i)));

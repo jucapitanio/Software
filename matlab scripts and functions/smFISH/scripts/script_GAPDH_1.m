@@ -33,10 +33,10 @@ clear AnalysisDate;
 % folder.
 rootfolder = pwd;
 numimg = length(dir(strcat(rootfolder, '\cell masks'))) - 2;
-date = '20150716';
+date = '20150925';
 
 parfor i = 1:numimg
-    createSegmenttrans(strcat('Pos',num2str(i)));
+    createSegmenttrans(strcat('Pos',num2str(i))); %Careful, they added a _*.tif in thi function that should be *.tif only.
 end;
 %% 
 createSegImages('tif');
@@ -52,7 +52,7 @@ trainingSet=trainRFClassifier(trainingSet);
 
 %% 
 load trainingSet_cy3_GAPDH.mat
-classifySpotsOnDirectory(1,trainingSet,'cy3')
+classifySpotsOnDirectory(1,trainingSet,'cy3') % make sure this function has a case with your dye to get assigned to dyeToDo, somehow it can't read from the Aro_paramenters.
 
 %% run the function reviewFISHClassification('dye_PosX') in the 2012a version of MATLAB. 
 % Use an image different from the one used to create the training set and repeat the process for all channels.
@@ -77,7 +77,7 @@ classifySpotsOnDirectory(1,trainingSet,'cy3')
 cy3Spotstats = strcat(rootfolder, '\AnalysisJu\SpotStats\cy3');
 
 cd(cy3Spotstats);
-spotStatsDataAligning([date 'cy3'], 0);
+spotStatsDataAligning([date 'cy3'], 0); %For this function, also make sure there is a case that matches your dye used.
 
 cd(rootfolder);
 

@@ -2,7 +2,7 @@
 % In case the paths were lost from the 1st script.
 addpath(genpath('C:\Users\Juliana\Documents\MATLAB'));
 addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Software\matlab scripts and functions'));
-addpath(genpath(strcat('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\somestufftogettofolder\', AnalysisDate)));
+addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\new script iso\rootCell'));
 %% Looping all the functions I made to analyze all images and save data
 
 %parpool;
