@@ -1,9 +1,9 @@
 function [ imagebig ] = PreProcessImages( image )
 % preprocess the raw image 
-% Taken from the #D membrane reconstruction library
+% Taken from the 3D membrane reconstruction library
 
 wimg3 = image;
-wimg3=wimg3-ImgTh(wimg3,0.8);
+wimg3=wimg3-ImgTh(wimg3,0.4); %usually 0.8 changing to see effect
 wimg3(wimg3<0)=0;
 extsize=5;
 wimg3_ext=zeros(size(wimg3)+2*extsize);

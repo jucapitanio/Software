@@ -1,0 +1,20 @@
+
+function dilatemask(input, filename) {
+
+	newfile = input + filename;
+	
+	open(newfile);
+	run("Options...", "iterations=20 count=1 black do=Dilate");
+	run("Save");
+	close();
+  
+}
+
+input = getDirectory("Input directory");
+
+// This will iterate the function created above in all the files present in input.
+setBatchMode(true);
+list = getFileList(input);
+for (i = 0; i < list.length; i++)
+        dilatemask(input, list[i]);
+setBatchMode(false);

@@ -44,7 +44,7 @@ for i = 1:numimg
         [ cy3dapi ] = Spot2NEdist( dapiiso, locs3 );
         clear locs3;
         
-        dist3 = struct('Pos', cy3_spotStats_file(5:10), 'Distance', coloccy3dapi(:,4));
+        dist3 = struct('Pos', cy3_spotStats_file(5:10), 'Distance', cy3dapi(:,4));
         spotNEdistCy3 = [spotNEdistCy3, dist3];
         clear dist3
 
@@ -78,3 +78,4 @@ save('AnalysisSummary.mat');
 struct2csv(cy3countstt, 'cy3countstt.csv')
 struct2csv(cy3midcountstt, 'cy3midcountstt.csv')
 struct2csv(cellarea, 'cellareaguess.csv')
+struct2csv(spotNEdistCy3, 'spotNEdistCy3.csv')

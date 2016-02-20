@@ -33,7 +33,8 @@ for i = 1:numimg
     
     cy3_spotStats_file = cy3_spotStats_files(i).name;
     [ locs3 ] = goodspots( cy3_spotStats_file );
-
+    
+    disp(strcat('Spots done at i=', num2str(i)));
     
     if not(isempty(locs3))
 
@@ -41,10 +42,12 @@ for i = 1:numimg
         [ dapiiso, Vnorm, stackmid ] = DAPIisosurface2( dapisegstackfile );
         clear dapisegstackfile;
         
+        disp(strcat('Isosurface done at i=', num2str(i)));
+        
         [ cy3dapi ] = Spot2NEdist( dapiiso, locs3 );
         clear locs3;
         
-        dist3 = struct('Pos', cy3_spotStats_file(5:10), 'Distance', coloccy3dapi(:,4));
+        dist3 = struct('Pos', cy3_spotStats_file(5:10), 'Distance', cy3dapi(:,4));
         spotNEdistCy3 = [spotNEdistCy3, dist3];
         clear dist3
 
@@ -59,12 +62,16 @@ for i = 1:numimg
         cy3midcountstt = [cy3midcountstt, cy3countsmid];
         
         clear cy3countsmid;
+        
+        disp(strcat('Counts done at i=', num2str(i)));
 
         figspanel1dye( dapiiso, Vnorm, cy3dapi, cy3mid, cy3_spotStats_file);
         
         clear cy3mid stackmid;
         save(strcat(rootfolder,'\SpotsData\SpotsIsosurf',cy3_spotStats_file(5:10),'.mat'));
         clear  cy3_spotStats_file cy3dapi Vnorm dapiiso;
+        
+        disp(strcat('SpotsData saved for i=', num2str(i)))
          
     end;
 end;
@@ -78,3 +85,4 @@ save('AnalysisSummary.mat');
 struct2csv(cy3countstt, 'cy3countstt.csv')
 struct2csv(cy3midcountstt, 'cy3midcountstt.csv')
 struct2csv(cellarea, 'cellareaguess.csv')
+struct2csv(spotNEdistCy3, 'spotNEdistCy3.csv')

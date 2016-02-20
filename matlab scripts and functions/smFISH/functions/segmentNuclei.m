@@ -19,9 +19,11 @@ function [imgfillmask] = segmentNuclei(im, level)
 % use that here as an argument above
 %level = graythresh(im);
 mask = im2bw(im,level);
-
+mask = imfill(mask, 'holes');% I added this since activecontour does not accept masks with holes. If it breaks the code, remove it.
 % Evolve segmentation
-BW = activecontour(im, mask, 100, 'Chan-Vese','SmoothFactor',1.5,'ContractionBias',0.5);
+% Ièm changing the contraction bias to zero here to see what happens. If
+% bad revert to 0.5 as before.
+BW = activecontour(im, mask, 100, 'Chan-Vese','SmoothFactor',1.5,'ContractionBias',0);
 
 % Suppress components connected to image border
 BW = imclearborder(BW);
@@ -32,7 +34,8 @@ BW = imfill(BW, 'holes');
 % Filter components by area, uncomment if desired.
 % The nuclei in a mid stack is between 8000 and 14000 or so
 % Good limits may be [2500 30000]
-BW = bwareafilt(BW, [50 30000]);
+BW = bwareafilt(BW, [1000 30000]); % I'm changing this to see if I eliminate
+% background small dirt. Initial filter [50 30000].
 
 % Form masked image from input image and segmented image.
 maskedImage = im;

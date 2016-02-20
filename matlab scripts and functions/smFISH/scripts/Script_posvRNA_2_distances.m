@@ -2,10 +2,9 @@
 % In case the paths were lost from the 1st script.
 addpath(genpath('C:\Users\Juliana\Documents\MATLAB'));
 addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Software\matlab scripts and functions'));
-addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\new script iso\rootCell'));
+%addpath(genpath('C:\Users\Juliana\Documents\Lab Stuff 2015\Images\DeltaVision microscope\September 25 2015\posvRNA\new script iso\rootCell'));
 %% Looping all the functions I made to analyze all images and save data
 
-%parpool;
 rootfolder = pwd;
 numimg = size(dir(strcat(rootfolder, '\cell masks')),1) - 2;
 
@@ -21,12 +20,14 @@ cy5midcountstt = struct('nuclear',{}, 'cyto',{}, 'total',{}, 'per100nuc',{}, 'Po
 
 cellarea = struct('cellareaguess',{}, 'Pos', {});
 
+spotNEdistCy3 = struct('Pos',{}, 'Distance',{});
+spotNEdistCy5 = struct('Pos',{}, 'Distance',{});
 
 % I cannot do clear or save inside a parfor loop, so I had to make it a for
 % loop again... See if therre is another way to use parallel computing, or
 % if you have parfor loops inside all functions possible.
 
-for i = 21:numimg
+for i = 1:numimg
     
     segmenttrans_maskfile = cellsegmask(i).name;
     cell_area_guess = guestimatecellarea(segmenttrans_maskfile, segmenttrans_maskfile(14:18)); % if more than 99 images will get processed, change to (14:19).
@@ -49,7 +50,14 @@ for i = 21:numimg
         [ coloccy3dapi ] = Spot2NEdist( dapiiso, colocalizedcy3 );
         [ coloccy5dapi ] = Spot2NEdist( dapiiso, colocalizedcy5 );
         clear colocalizedcy3 colocalizedcy5;
-
+        
+        dist3 = struct('Pos', cy3_spotStats_file(5:10), 'Distance', coloccy3dapi(:,4));
+        dist5 = struct('Pos', cy5_spotStats_file(5:10), 'Distance', coloccy5dapi(:,4));
+        
+        spotNEdistCy3 = [spotNEdistCy3, dist3];
+        spotNEdistCy5 = [spotNEdistCy5, dist5];
+        clear dist3 dist5;
+        
         [ cy3counts ] = countsum( coloccy3dapi, cy3_spotStats_file(5:10) );
         [ cy5counts ] = countsum( coloccy5dapi, cy5_spotStats_file(5:10) );
         
@@ -87,3 +95,5 @@ struct2csv(cy3midcountstt, 'cy3midcountstt.csv')
 struct2csv(cy5midcountstt, 'cy5midcountstt.csv')
 struct2csv(cy5countstt, 'cy5countstt.csv')
 struct2csv(cellarea, 'cellareaguess.csv')
+struct2csv(spotNEdistCy3, 'spotNEdistCy3.csv')
+struct2csv(spotNEdistCy5, 'spotNEdistCy5.csv')

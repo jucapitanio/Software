@@ -54,8 +54,8 @@ function cell_images(input, output, filename) {
 }
 
 // Below are the folder were your .dv files are (input) and the folder where you'd like to save the files (output).
-input = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015 2nd sem\\Images\\Jul16_15\\vRNA FISH\\deconv for RF\\Images_original\\";
-output = "C:\\Users\\Juliana\\Documents\\Lab Stuff 2015 2nd sem\\Images\\Jul16_15\\vRNA FISH\\deconv for RF\\rootCell\\ImageData\\";
+input = getDirectory("Input directory");
+output = getDirectory("Output directory");
 
 // This will iterate the function created above in all the files present in input.
 setBatchMode(true);
