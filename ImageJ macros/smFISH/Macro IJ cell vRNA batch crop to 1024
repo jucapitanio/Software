@@ -1,0 +1,71 @@
+/*
+We start by creating a function that can perform all the steps we need to create the necessary files.
+This function will get a .dv file, and output a mask for the entire cell (based on dapi + smFISH staining). Saved as .tif.
+The channels are also saved separately in .tif files.
+*/
+
+function cell_images(input, output, filename) {
+  /*
+  Below we will use the Bio-Formats importer plugin to open the images.
+  It works best if you create one variable with the location of file to open (newfile) and another with the options for the importer (options).
+  */
+  newfile = input + filename;
+  options = "open=newfile autoscale color_mode=Default split_channels view=[Standard ImageJ] stack_order=XYZCT";
+  run("Bio-Formats Importer",options);
+
+  /*
+  For each channel we save a .tif file separately.
+  Then we create a Z projection of intensity sum to use for the mask and close the original stack file.
+  */
+  selectWindow(filename + " - C=0");
+  makeRectangle(512, 512, 1024, 1024);
+  run("Crop");
+  saveAs("Tiff", output + "cy5_" + filename + ".tif");
+  run("Z Project...", "projection=[Sum Slices]");
+  selectWindow("cy5_" + filename + ".tif");
+  close();
+  selectWindow(filename + " - C=1");
+  makeRectangle(512, 512, 1024, 1024);
+  run("Crop");
+  saveAs("Tiff", output + "cy3_" + filename + ".tif");
+  run("Z Project...", "projection=[Sum Slices]");
+  selectWindow("cy3_" + filename + ".tif");
+  close();
+  selectWindow(filename + " - C=2");
+  makeRectangle(512, 512, 1024, 1024);
+  run("Crop");
+  saveAs("Tiff", output + "dapi_" + filename + ".tif");
+  run("Z Project...", "projection=[Sum Slices]");
+  selectWindow("dapi_" + filename + ".tif");
+  close();
+
+  /*
+  We join all the projections of different channels into one stack, blur them and create masks.
+  The masks are again Z-projected as max intensity to create a single mask encompassing the entire cell.
+  This mask is also save as a .tif file.
+  */
+
+  run("Images to Stack", "name=Stack title=[]");
+  run("Gaussian Blur...", "sigma=5 stack");
+  setOption("BlackBackground", true);
+  run("Convert to Mask", "method=Default background=Default calculate black");
+  run("Z Project...", "projection=[Max Intensity]");
+  selectWindow("Stack");
+  close();
+  selectWindow("MAX_Stack");
+  run("Convert to Mask");
+  saveAs("Tiff", output + "Mask_" + filename + ".tif");
+  close();
+
+}
+
+// Below are the folder were your .dv files are (input) and the folder where you'd like to save the files (output).
+input = getDirectory("Input directory");
+output = getDirectory("Output directory");
+
+// This will iterate the function created above in all the files present in input.
+setBatchMode(true);
+list = getFileList(input);
+for (i = 0; i < list.length; i++)
+        cell_images(input, output, list[i]);
+setBatchMode(false);

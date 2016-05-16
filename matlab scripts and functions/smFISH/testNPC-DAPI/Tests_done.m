@@ -139,7 +139,7 @@ dapifillgaus.vertices(:,3) = (dapifillgaus.vertices(:,3)* 2.213736) - 2.213726;
 %% Plotting
 
 pd = patch(dapiiso);
-Vnorm;
+Vnormdapi;
 pd.FaceColor = 'blue';
 pd.EdgeColor = 'none';
 daspect([1,1,1]) % Corrigir isso no make fig.
@@ -152,3 +152,32 @@ hold on
 
 scatter3(cy5dapi(cy5dapi(:,4) < 0,1),cy5dapi(cy5dapi(:,4) < 0,2),cy5dapi ...
     (cy5dapi(:,4) < 0,3),'MarkerEdgeColor','red','Marker','.');
+
+%% Ben's tests
+
+pd = patch(dapiiso);
+Vnormdapi;
+pd.FaceColor = 'blue';
+pd.EdgeColor = 'none';
+daspect([1,1,1]) % Corrigir isso no make fig.
+view(3); axis tight
+camlight 
+lighting gouraud
+pd.FaceAlpha = 0.25;
+
+hold on
+
+pd = patch(cy5iso);
+Vnormcy5;
+pd.FaceColor = 'red';
+pd.EdgeColor = 'none';
+daspect([1,1,1]) % Corrigir isso no make fig.
+view(3); axis tight
+camlight 
+lighting gouraud
+pd.FaceAlpha = 0.25;
+
+hold on
+
+scatter3(cy3dapinucleoli(:,1),cy3dapinucleoli(:,2),cy3dapinucleoli(:,3),'MarkerEdgeColor','green','Marker','.');
+whitebg('black');

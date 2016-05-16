@@ -18,8 +18,6 @@ cy3midcountstt = struct('nuclear',{}, 'cyto',{}, 'total',{}, 'per100nuc',{}, 'Po
 
 cellarea = struct('cellareaguess',{}, 'Pos', {});
 
-spotNEdistCy3 = struct('Pos',{}, 'Distance',{});
-
 % I cannot do clear or save inside a parfor loop, so I had to make it a for
 % loop again... See if therre is another way to use parallel computing, or
 % if you have parfor loops inside all functions possible.

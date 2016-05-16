@@ -1,0 +1,19 @@
+function image_crop(input, filename) {
+  /*
+  Below we will use the Bio-Formats importer plugin to open the images.
+  It works best if you create one variable with the location of file to open (newfile) and another with the options for the importer (options).
+  */
+  newfile = input + filename;
+  options = "open=newfile autoscale color_mode=Default crop view=[Standard ImageJ] stack_order=XYZCT x_coordinate_1=512 y_coordinate_1=512 width_1=1024 height_1=1024";
+  run("Bio-Formats Importer",options);
+  saveAs("Tiff", input + filename + ".tif");
+  close();
+}  
+input = getDirectory("Input directory");
+
+// This will iterate the function created above in all the files present in input.
+setBatchMode(true);
+list = getFileList(input);
+for (i = 0; i < list.length; i++)
+        image_crop(input, list[i]);
+setBatchMode(false);
